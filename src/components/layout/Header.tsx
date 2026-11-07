@@ -4,6 +4,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useCallback, useEffect, useRef, useState } from "react";
+import { createPortal } from "react-dom";
 import { ChevronDown, Mail, Menu, Phone, X } from "lucide-react";
 import { mainNav, offices, site } from "@/config/site";
 import { practiceAreas } from "@/content/practice-areas";
@@ -82,7 +83,7 @@ export function Header() {
 
   return (
     <header
-      className={`fixed inset-x-0 top-0 z-50 transition-[background-color,box-shadow,padding] duration-500 ${
+      className={`fixed inset-x-0 top-0 ${menuOpen ? "z-[60]" : "z-50"} transition-[background-color,box-shadow,padding] duration-500 ${
         solid
           ? "bg-white/95 shadow-[0_1px_0_rgba(5,17,72,0.08),0_12px_32px_-18px_rgba(5,17,72,0.25)] backdrop-blur"
           : "bg-transparent"
@@ -219,77 +220,79 @@ export function Header() {
         </button>
       </div>
 
-      {/* Mobile menu panel */}
-      <div
-        id="mobile-menu"
-        ref={panelRef}
-        role="dialog"
-        aria-modal="true"
-        aria-label="Site menu"
-        hidden={!menuOpen}
-        className="on-dark facade fixed inset-x-0 top-0 z-[55] h-dvh touch-pan-y overflow-y-scroll overscroll-y-contain bg-navy-950 px-6 pb-10 pt-28 text-white lg:hidden"
-        style={{ WebkitOverflowScrolling: "touch" }}
-      >
-        <nav aria-label="Mobile">
-          <ul className="space-y-1">
-            {mainNav.map((item) => (
-              <li key={item.href}>
-                <Link
-                  href={item.href}
-                  aria-current={isActive(item.href) ? "page" : undefined}
-                  className={`block border-b border-white/10 py-3.5 text-2xl font-light tracking-tight ${isActive(item.href) ? "font-semibold" : ""}`}
-                >
-                  {item.label}
-                </Link>
-                {item.href === "/practice-areas" && (
-                  <ul className="mb-3 grid grid-cols-1 gap-x-6 py-2 sm:grid-cols-2">
-                    {practiceAreas.map((a) => (
-                      <li key={a.slug}>
-                        <Link
-                          href={`/practice-areas/${a.slug}`}
-                          className="flex gap-3 py-2 text-sm text-white/75 hover:text-white"
-                        >
-                          <span className="font-bold text-white/40">{a.number}</span>
-                          {a.shortTitle}
-                        </Link>
-                      </li>
-                    ))}
-                  </ul>
-                )}
-              </li>
-            ))}
-          </ul>
-        </nav>
-
-        <Link href="/contact#consultation" className="btn btn-light mt-8 w-full">
-          Request a consultation
-        </Link>
-
-        <div className="mt-8 space-y-3 text-sm">
-          {offices.map((o) => (
-            <a
-              key={o.id}
-              href={`tel:${o.phones[0].tel}`}
-              className="flex items-center gap-3 border border-white/20 px-4 py-3 text-white"
-            >
-              <Phone className="h-4 w-4 shrink-0" aria-hidden="true" />
-              <span>
-                <span className="block text-xs uppercase tracking-[0.14em] text-white/60">
-                  {o.name}
-                </span>
-                {o.phones[0].display}
-              </span>
-            </a>
-          ))}
-          <a
-            href={`mailto:${site.email}`}
-            className="flex items-center gap-3 border border-white/20 px-4 py-3 text-white"
+      {menuOpen &&
+        createPortal(
+          <div
+            id="mobile-menu"
+            ref={panelRef}
+            role="dialog"
+            aria-modal="true"
+            aria-label="Site menu"
+            className="on-dark fixed inset-x-0 top-0 z-[55] h-dvh touch-pan-y overflow-y-scroll overscroll-y-contain bg-navy-950 px-6 pb-10 pt-20 text-white lg:hidden"
+            style={{ WebkitOverflowScrolling: "touch" }}
           >
-            <Mail className="h-4 w-4 shrink-0" aria-hidden="true" />
-            {site.email}
-          </a>
-        </div>
-      </div>
+            <nav aria-label="Mobile">
+              <ul className="space-y-1">
+                {mainNav.map((item) => (
+                  <li key={item.href}>
+                    <Link
+                      href={item.href}
+                      aria-current={isActive(item.href) ? "page" : undefined}
+                      className={`block border-b border-white/10 py-3.5 text-2xl font-light tracking-tight ${isActive(item.href) ? "font-semibold" : ""}`}
+                    >
+                      {item.label}
+                    </Link>
+                    {item.href === "/practice-areas" && (
+                      <ul className="mb-3 grid grid-cols-1 gap-x-6 py-2 sm:grid-cols-2">
+                        {practiceAreas.map((a) => (
+                          <li key={a.slug}>
+                            <Link
+                              href={`/practice-areas/${a.slug}`}
+                              className="flex gap-3 py-2 text-sm text-white/75 hover:text-white"
+                            >
+                              <span className="font-bold text-white/40">{a.number}</span>
+                              {a.shortTitle}
+                            </Link>
+                          </li>
+                        ))}
+                      </ul>
+                    )}
+                  </li>
+                ))}
+              </ul>
+            </nav>
+
+            <Link href="/contact#consultation" className="btn btn-light mt-8 w-full">
+              Request a consultation
+            </Link>
+
+            <div className="mt-8 space-y-3 text-sm">
+              {offices.map((o) => (
+                <a
+                  key={o.id}
+                  href={`tel:${o.phones[0].tel}`}
+                  className="flex items-center gap-3 border border-white/20 px-4 py-3 text-white"
+                >
+                  <Phone className="h-4 w-4 shrink-0" aria-hidden="true" />
+                  <span>
+                    <span className="block text-xs uppercase tracking-[0.14em] text-white/60">
+                      {o.name}
+                    </span>
+                    {o.phones[0].display}
+                  </span>
+                </a>
+              ))}
+              <a
+                href={`mailto:${site.email}`}
+                className="flex items-center gap-3 border border-white/20 px-4 py-3 text-white"
+              >
+                <Mail className="h-4 w-4 shrink-0" aria-hidden="true" />
+                {site.email}
+              </a>
+            </div>
+          </div>,
+          document.body,
+        )}
 
       <style>{`
         .navlink{position:relative;padding:.6rem .85rem;font-size:.8125rem;font-weight:600;letter-spacing:.06em;text-transform:uppercase;transition:opacity .3s}

@@ -203,6 +203,22 @@ test.describe("navigation", () => {
     await expect(dialog.getByRole("link", { name: "info@cmiattorneys.co.za" })).toBeInViewport();
   });
 
+  test("mobile menu starts near the top and fully covers the page", async ({ page }, info) => {
+    test.skip(info.project.name !== "mobile");
+    await page.goto("/about");
+    await page.evaluate(() => window.scrollTo(0, 600));
+    await page.getByRole("button", { name: "Open menu" }).click();
+    const dialog = page.getByRole("dialog", { name: "Site menu" });
+    const bounds = await dialog.boundingBox();
+    expect(bounds?.y).toBe(0);
+    expect(bounds?.height).toBe(844);
+    await expect(dialog).toHaveCSS("background-color", "rgb(3, 10, 46)");
+
+    const homeLink = dialog.getByRole("link", { name: "Home", exact: true });
+    await expect(homeLink).toBeInViewport();
+    expect((await homeLink.boundingBox())?.y).toBeLessThan(110);
+  });
+
   test("header turns solid after scrolling", async ({ page }) => {
     await page.goto("/");
     const header = page.locator("header");
