@@ -186,6 +186,23 @@ test.describe("navigation", () => {
     await expect(dialog).toBeHidden();
   });
 
+  test("mobile menu content can be scrolled", async ({ page }, info) => {
+    test.skip(info.project.name !== "mobile");
+    await page.goto("/");
+    await page.getByRole("button", { name: "Open menu" }).click();
+    const dialog = page.getByRole("dialog", { name: "Site menu" });
+    await expect(dialog).toBeVisible();
+    await expect
+      .poll(() => dialog.evaluate((element) => element.scrollHeight > element.clientHeight))
+      .toBe(true);
+
+    await dialog.evaluate((element) => element.scrollTo(0, element.scrollHeight));
+    await expect
+      .poll(() => dialog.evaluate((element) => element.scrollTop))
+      .toBeGreaterThan(0);
+    await expect(dialog.getByRole("link", { name: "info@cmiattorneys.co.za" })).toBeInViewport();
+  });
+
   test("header turns solid after scrolling", async ({ page }) => {
     await page.goto("/");
     const header = page.locator("header");

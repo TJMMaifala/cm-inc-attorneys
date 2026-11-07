@@ -227,7 +227,8 @@ export function Header() {
         aria-modal="true"
         aria-label="Site menu"
         hidden={!menuOpen}
-        className="on-dark facade fixed inset-0 z-[55] overflow-y-auto bg-navy-950 px-6 pb-10 pt-28 text-white lg:hidden"
+        className="on-dark facade fixed inset-x-0 top-0 z-[55] h-dvh touch-pan-y overflow-y-scroll overscroll-y-contain bg-navy-950 px-6 pb-10 pt-28 text-white lg:hidden"
+        style={{ WebkitOverflowScrolling: "touch" }}
       >
         <nav aria-label="Mobile">
           <ul className="space-y-1">
